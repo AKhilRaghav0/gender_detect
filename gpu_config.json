@@ -1,0 +1,9 @@
+{
+  "gpu_available": true,
+  "gpu_type": "RTX_3050",
+  "cuda_version": null,
+  "tensorflow_gpu": false,
+  "recommended_batch_size": 64,
+  "recommended_image_size": 224,
+  "mixed_precision": true
+}
