@@ -103,9 +103,9 @@ gpu_config.json
 *.backup
 *.old
 
-# Test outputs
-test_*.py
-*_test.py
+# Test outputs (keeping test files for cloud debugging)
+# test_*.py      # Commented out - keeping test files for cloud
+# *_test.py      # Commented out - keeping test files for cloud
 test_results/
 coverage/
 .coverage
