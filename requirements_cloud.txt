@@ -1,0 +1,35 @@
+# Cloud-Optimized Requirements for Lambda Cloud
+# These versions are tested and compatible with cloud GPU environments
+
+# Core TensorFlow (GPU-enabled on cloud)
+tensorflow>=2.15.0
+tensorflow-hub>=0.15.0
+
+# Computer Vision
+opencv-python>=4.8.0
+opencv-contrib-python>=4.8.0
+
+# Core ML libraries
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Image processing and augmentation
+Pillow>=10.0.0
+albumentations>=1.3.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Utilities
+tqdm>=4.65.0
+pandas>=2.0.0
+
+# GPU monitoring and optimization
+psutil>=5.9.0
+memory-profiler>=0.60.0
+pynvml>=11.4.0
+gpustat>=1.0.0
+
+# Additional dependencies
+cvlib>=0.2.7

@@ -1,0 +1,121 @@
+# Python environments
+gender_detection_env/
+gender_detect_py311/
+venv/
+env/
+.venv/
+.env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Model files (too large for git)
+*.model
+*.h5
+*.keras
+*.pb
+*.tflite
+*.onnx
+*.pt
+*.pth
+
+# Training outputs
+training_logs/
+checkpoints/
+logs/
+runs/
+*.log
+*.csv
+*.png
+*.jpg
+*.jpeg
+
+# Data files (keeping datasets for portability)
+*.zip
+*.tar.gz
+*.rar
+*.7z
+# datasets/  # Commented out - keeping datasets with repo
+# data/      # Commented out - keeping data with repo
+# images/    # Commented out - keeping images with repo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# GPU setup files (not needed on cloud)
+vc_redist.x64.exe
+gpu_config.json
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Test outputs
+test_*.py
+*_test.py
+test_results/
+coverage/
+.coverage
+htmlcov/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Package files
+*.whl
+*.tar.gz
+*.zip
