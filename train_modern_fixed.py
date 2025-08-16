@@ -212,9 +212,9 @@ class ModernGenderDetector:
     
     def create_callbacks(self):
         """Create training callbacks"""
-        callbacks = [
+        callback_list = [
             # Early stopping
-            callbacks.EarlyStopping(
+            tf.keras.callbacks.EarlyStopping(
                 monitor='val_loss',
                 patience=10,
                 restore_best_weights=True,
@@ -222,7 +222,7 @@ class ModernGenderDetector:
             ),
             
             # Reduce learning rate on plateau
-            callbacks.ReduceLROnPlateau(
+            tf.keras.callbacks.ReduceLROnPlateau(
                 monitor='val_loss',
                 factor=0.5,
                 patience=5,
@@ -231,7 +231,7 @@ class ModernGenderDetector:
             ),
             
             # Model checkpoint
-            callbacks.ModelCheckpoint(
+            tf.keras.callbacks.ModelCheckpoint(
                 'best_gender_model.keras',
                 monitor='val_accuracy',
                 save_best_only=True,
@@ -239,7 +239,7 @@ class ModernGenderDetector:
             ),
             
             # TensorBoard
-            callbacks.TensorBoard(
+            tf.keras.callbacks.TensorBoard(
                 log_dir='./logs',
                 histogram_freq=1,
                 write_graph=True,
@@ -247,7 +247,7 @@ class ModernGenderDetector:
             )
         ]
         
-        return callbacks
+        return callback_list
     
     def train(self):
         """Train the model"""
