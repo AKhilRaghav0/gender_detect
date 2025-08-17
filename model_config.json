@@ -1,0 +1,11 @@
+{
+  "img_size": 224,
+  "batch_size": 32,
+  "epochs": 50,
+  "class_names": [
+    "man",
+    "woman"
+  ],
+  "num_classes": 2,
+  "use_mixed_precision": true
+}

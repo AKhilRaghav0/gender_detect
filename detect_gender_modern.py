@@ -6,8 +6,10 @@ Using ResNet50 model with advanced face detection
 
 import cv2
 import numpy as np
+import os
+# Set environment variable for TensorFlow 2.20.0 compatibility
+os.environ['TF_USE_LEGACY_KERAS'] = 'true'
 import tensorflow as tf
-from tensorflow import keras
 import json
 import time
 from pathlib import Path
@@ -107,7 +109,9 @@ class ModernGenderDetector:
             if not Path(self.model_path).exists():
                 raise FileNotFoundError(f"Model file not found: {self.model_path}")
             
-            self.model = keras.models.load_model(self.model_path)
+            # Use tf.keras with legacy compatibility
+            self.model = tf.keras.models.load_model(self.model_path)
+            
             print(f"✅ Model loaded successfully from {self.model_path}")
             
         except Exception as e:
