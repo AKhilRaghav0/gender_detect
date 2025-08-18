@@ -13,3 +13,4 @@ Pillow>=10.0.0
 
 # Optional - for better performance
 # tensorflow-cpu>=2.15.0  # Uncomment if you want CPU-only version
+

@@ -1,0 +1,25 @@
+# Backend requirements for Bus Safety Gender Detection System
+
+# FastAPI and web framework
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+python-multipart==0.0.20
+
+# Appwrite integration
+appwrite==11.1.0
+
+# Image processing and computer vision
+opencv-python==4.8.1.78
+Pillow==10.0.1
+numpy==1.24.3
+
+# Data validation and serialization
+pydantic==2.11.7
+
+# Logging and utilities
+python-json-logger==2.0.7
+
+# Development and testing (optional)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
