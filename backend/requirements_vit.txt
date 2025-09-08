@@ -1,0 +1,16 @@
+# ViT Gender Detection Requirements
+transformers>=4.30.0
+torch>=2.0.0
+torchvision>=0.15.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+Pillow>=10.0.0
+
+# Optional: For better performance
+# accelerate  # For faster model loading
+# safetensors  # For safer model loading
+
+
+
+
+

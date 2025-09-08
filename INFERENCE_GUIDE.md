@@ -149,3 +149,8 @@ Your **83% accurate** gender detection model is ready to run on your laptop!
 
 **🎯 Ready to detect some genders? Run the webcam mode and see it in action! 🚀**
 
+
+
+
+
+
