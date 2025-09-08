@@ -34,3 +34,11 @@ memory-profiler>=0.60.0
 # GPU monitoring (optional)
 pynvml>=11.4.0
 gpustat>=1.0.0
+
+# SCRFD Face Detection (ONNX-based)
+onnxruntime>=1.15.0
+
+# Advanced Gender Classification (PyTorch-based)
+torch>=2.0.0
+torchvision>=0.15.0
+Pillow>=10.0.0
