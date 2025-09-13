@@ -1,0 +1,20 @@
+# Raspberry Pi 5 Optimized Requirements
+# Minimal dependencies for 24/7 bus operation
+
+flask==2.3.3
+opencv-python==4.8.1.78
+numpy==1.24.3
+insightface==0.7.3
+onnxruntime==1.16.3
+onnx==1.14.1
+Pillow==10.0.1
+scipy==1.11.3
+scikit-learn==1.3.2
+scikit-image==0.21.0
+matplotlib==3.7.2
+tqdm==4.66.1
+easydict==1.10
+cython==3.0.2
+albumentations==1.3.1
+prettytable==3.9.0
+

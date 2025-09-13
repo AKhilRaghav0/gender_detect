@@ -17,6 +17,7 @@ import uvicorn
 
 from redis_integration import RedisService, BusData, SafetyLevel
 from safety_algorithm import SafetyAlgorithm, SafetyScore
+from unified_gender_detector import create_gender_detector, DetectionAlgorithm
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +42,7 @@ app.add_middleware(
 # Global services
 redis_service = RedisService()
 safety_algorithm = SafetyAlgorithm()
+gender_detector = create_gender_detector("insightface")  # Use InsightFace for best accuracy
 
 # Pydantic models
 class GenderDetectionRequest(BaseModel):
@@ -165,8 +167,7 @@ async def detect_gender(request: GenderDetectionRequest):
     start_time = datetime.now()
     
     try:
-        # TODO: Implement actual gender detection using your existing algorithms
-        # For now, return mock data
+        # Implement actual gender detection using unified detector
         import base64
         import numpy as np
         import cv2
@@ -176,10 +177,16 @@ async def detect_gender(request: GenderDetectionRequest):
         nparr = np.frombuffer(image_bytes, np.uint8)
         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        # Mock detection results (replace with actual detection)
-        passenger_count = 25
-        female_count = 12
-        male_count = 13
+        # Use unified detector for actual gender detection
+        detection_results = gender_detector.detect_gender(image)
+        
+        # Count passengers by gender
+        passenger_count = len(detection_results)
+        female_count = sum(1 for result in detection_results if result.gender == "Female")
+        male_count = sum(1 for result in detection_results if result.gender == "Male")
+        
+        # Calculate average confidence
+        avg_confidence = sum(result.confidence for result in detection_results) / len(detection_results) if detection_results else 0.0
         
         # Create bus data
         bus_data = BusData(
@@ -231,7 +238,7 @@ async def detect_gender(request: GenderDetectionRequest):
             safety_score=safety_score.overall_score,
             safety_level=safety_score.safety_level.value,
             recommendations=safety_score.recommendations,
-            confidence=safety_score.confidence,
+            confidence=avg_confidence,
             processing_time=processing_time
         )
         
@@ -389,6 +396,66 @@ async def get_safety_alerts(limit: int = 10):
     except Exception as e:
         logger.error(f"❌ Failed to get alerts: {e}")
         raise HTTPException(status_code=500, detail="Failed to get alerts")
+
+@app.get("/api/v1/detector/status")
+async def get_detector_status():
+    """Get current detector status and performance"""
+    try:
+        stats = gender_detector.get_performance_stats()
+        return {
+            "algorithm": gender_detector.algorithm.value,
+            "performance_stats": stats,
+            "status": "active"
+        }
+    except Exception as e:
+        logger.error(f"❌ Failed to get detector status: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get detector status")
+
+@app.post("/api/v1/detector/switch")
+async def switch_detector_algorithm(algorithm: str):
+    """Switch to a different detection algorithm"""
+    try:
+        # Validate algorithm
+        valid_algorithms = [algo.value for algo in DetectionAlgorithm]
+        if algorithm not in valid_algorithms:
+            raise HTTPException(status_code=400, detail=f"Invalid algorithm. Valid options: {valid_algorithms}")
+        
+        # Switch algorithm
+        gender_detector.switch_algorithm(DetectionAlgorithm(algorithm))
+        
+        return {
+            "success": True,
+            "message": f"Switched to {algorithm} algorithm",
+            "current_algorithm": gender_detector.algorithm.value
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Failed to switch algorithm: {e}")
+        raise HTTPException(status_code=500, detail="Failed to switch algorithm")
+
+@app.get("/api/v1/statistics")
+async def get_system_statistics():
+    """Get comprehensive system statistics"""
+    try:
+        # Get Redis stats
+        redis_stats = redis_service.get_system_stats()
+        
+        # Get detector stats
+        detector_stats = gender_detector.get_performance_stats()
+        
+        # Get active routes
+        active_routes = redis_service.get_active_routes()
+        
+        return {
+            "redis_stats": redis_stats,
+            "detector_stats": detector_stats,
+            "active_routes": len(active_routes),
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"❌ Failed to get statistics: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get statistics")
 
 @app.websocket("/ws/bus-safety")
 async def websocket_endpoint(websocket: WebSocket):
