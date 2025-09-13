@@ -407,7 +407,7 @@ class LiveSCRFDetection:
         cv2.putText(frame, label, (x+5, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
         # Confidence percentage
-        confidence_text = ".1f"
+        confidence_text = f"{confidence:.1f}%"
         conf_size = cv2.getTextSize(confidence_text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
         cv2.putText(frame, confidence_text, (x+w-conf_size[0]-5, y-5),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
