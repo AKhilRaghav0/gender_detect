@@ -127,10 +127,99 @@ class LiveSCRFDetection:
             'forehead_ratio': 0.15
         }
 
-        # Initialize camera
-        self.cap = cv2.VideoCapture(0)
-        if not self.cap.isOpened():
-            raise Exception("❌ Cannot open webcam!")
+        # Initialize camera with WSL/Windows compatibility
+        self.cap = None
+        self._init_camera()
+
+    def _init_camera(self):
+        """Initialize camera with WSL/Windows compatibility"""
+        print("📹 Initializing camera...")
+
+        # Try different camera indices
+        for camera_index in range(5):
+            try:
+                cap = cv2.VideoCapture(camera_index)
+                if cap.isOpened():
+                    # Test by reading a frame
+                    ret, test_frame = cap.read()
+                    if ret and test_frame is not None:
+                        self.cap = cap
+                        print(f"✅ Camera initialized successfully on index {camera_index}")
+                        print(f"   Resolution: {test_frame.shape[1]}x{test_frame.shape[0]}")
+                        return
+                # Clean up if not working
+                cap.release()
+            except Exception as e:
+                print(f"⚠️ Camera {camera_index} failed: {e}")
+                continue
+
+        # If no camera found, provide detailed troubleshooting
+        self._show_camera_error_help()
+
+    def _show_camera_error_help(self):
+        """Show comprehensive camera troubleshooting guide"""
+        import platform
+        is_wsl = 'microsoft' in platform.release().lower() or 'wsl' in platform.release().lower()
+
+        error_msg = f"""
+❌ Cannot open webcam!
+
+🔍 DETECTED ENVIRONMENT: {'WSL (Linux on Windows)' if is_wsl else 'Native Windows/Linux'}
+
+📋 TROUBLESHOOTING GUIDE:
+"""
+
+        if is_wsl:
+            error_msg += """
+🐧 WSL CAMERA ACCESS:
+• WSL has LIMITED camera support by default
+• Best to use Windows Python instead of WSL for camera access
+
+✅ RECOMMENDED SOLUTION:
+1. Exit WSL and use Windows PowerShell
+2. Run: python backend/live_scrfd_detection.py
+3. Camera will work perfectly!
+
+🔄 ALTERNATIVE WSL SOLUTIONS:
+1. Use IP webcam app on phone:
+   • Install IP Webcam app on Android
+   • Start server, get IP address
+   • Use: cv2.VideoCapture('http://192.168.1.xxx:8080/video')
+
+2. Use Windows camera from WSL (limited):
+   • Install: sudo apt install v4l-utils
+   • Check: v4l2-ctl --list-devices
+   • May require USB passthrough setup
+"""
+        else:
+            error_msg += """
+🪟 WINDOWS CAMERA TROUBLESHOOTING:
+1. Open Windows Camera app first
+2. Grant camera permissions when prompted
+3. Test camera in Windows Settings > Camera
+4. Close other apps using camera
+
+🔧 ADVANCED FIXES:
+• Update camera drivers
+• Run: python -c "import cv2; print(cv2.getBuildInformation())"
+• Try different camera indices (0, 1, 2...)
+• Check antivirus/firewall blocking camera
+"""
+
+        error_msg += """
+🧪 TEST COMMANDS:
+• Test OpenCV: python -c "import cv2; print('OpenCV OK')"
+• Test camera: python -c "import cv2; cap = cv2.VideoCapture(0); print(cap.isOpened())"
+• List devices: python -c "import cv2; print([i for i in range(5) if cv2.VideoCapture(i).isOpened()])"
+
+📞 SUPPORT:
+• Check camera connections
+• Try different USB ports
+• Restart computer
+• Update OpenCV: pip install --upgrade opencv-python
+"""
+
+        raise Exception(error_msg)
 
         # Performance tracking
         self.fps_start_time = time.time()

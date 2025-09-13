@@ -28,10 +28,102 @@ class LiveAdvancedGenderDetection:
             'forehead_ratio': 0.15
         }
 
-        # Initialize camera
-        self.cap = cv2.VideoCapture(0)
-        if not self.cap.isOpened():
-            raise Exception("❌ Cannot open webcam!")
+        # Initialize camera with enhanced compatibility
+        self.cap = None
+        self._init_camera_advanced()
+
+    def _init_camera_advanced(self):
+        """Initialize camera with advanced compatibility checking"""
+        print("📹 Initializing advanced camera system...")
+
+        # Detect environment
+        import platform
+        is_wsl = 'microsoft' in platform.release().lower() or 'wsl' in platform.release().lower()
+
+        if is_wsl:
+            print("🐧 WSL detected - camera access may be limited")
+            print("💡 Tip: Consider using Windows Python for better camera support")
+
+        # Try different camera sources
+        sources = [
+            ("Direct Camera 0", 0),
+            ("Direct Camera 1", 1),
+            ("Direct Camera 2", 2),
+        ]
+
+        # Add IP camera options for WSL
+        if is_wsl:
+            ip_options = [
+                "http://192.168.1.100:8080/video",
+                "http://10.0.0.100:8080/video",
+            ]
+            for ip_url in ip_options:
+                sources.append((f"IP Camera ({ip_url})", ip_url))
+
+        for name, source in sources:
+            try:
+                cap = cv2.VideoCapture(source)
+                if cap.isOpened():
+                    ret, test_frame = cap.read()
+                    if ret and test_frame is not None:
+                        self.cap = cap
+                        print(f"✅ {name}: {test_frame.shape[1]}x{test_frame.shape[0]} resolution")
+                        return
+                cap.release()
+            except Exception as e:
+                print(f"⚠️ {name}: Failed - {e}")
+
+        # If no camera found, show help
+        self._show_advanced_camera_help(is_wsl)
+
+    def _show_advanced_camera_help(self, is_wsl):
+        """Show advanced camera troubleshooting"""
+        help_msg = f"""
+❌ Cannot initialize camera!
+
+🔍 ENVIRONMENT: {'WSL (Limited camera support)' if is_wsl else 'Native Windows/Linux'}
+
+📋 SOLUTIONS:
+"""
+
+        if is_wsl:
+            help_msg += """
+🐧 WSL SOLUTIONS:
+1. 🎯 BEST: Use Windows Python instead
+   cd /mnt/c/Users/YourName/path/to/project
+   python backend/live_advanced_gender_detection.py
+
+2. 📱 IP Webcam (Recommended for WSL):
+   • Install IP Webcam app on phone
+   • Start server, get IP: http://192.168.1.xxx:8080
+   • The system will auto-detect IP cameras
+
+3. 🔧 Advanced WSL USB (Complex):
+   • Requires USBIPD-WIN setup
+   • Limited performance
+"""
+
+        else:
+            help_msg += """
+🪟 WINDOWS SOLUTIONS:
+1. 📷 Test Windows Camera app first
+2. 🔧 Check camera permissions in Settings
+3. 🔄 Try different USB ports
+4. 🔧 Update camera drivers
+"""
+
+        help_msg += """
+🧪 TEST COMMANDS:
+• Camera test: python test_camera_setup.py
+• OpenCV test: python -c "import cv2; print('OK')"
+• List cameras: python -c "import cv2; [print(f'Camera {i}: OK') for i in range(5) if cv2.VideoCapture(i).isOpened()]"
+
+📞 SUPPORT:
+• Run: python test_camera_setup.py (for detailed diagnostics)
+• Check: WSL_CAMERA_GUIDE.md (for WSL-specific help)
+"""
+
+        raise Exception(help_msg)
 
         # Performance tracking
         self.fps_start_time = time.time()
