@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gender Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .video-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        #videoElement {
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        #canvas {
+            display: none;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .status.running {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.stopped {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #e2e3e5;
+            padding: 15px;
+            border-radius: 3px;
+            margin: 20px 0;
+        }
+        .results {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 3px;
+        }
+        .face-result {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-left: 4px solid #007bff;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gender Detection System</h1>
+        
+        <div class="info">
+            <strong>Instructions:</strong><br>
+            1. Click "Start Detection" to begin<br>
+            2. Allow camera access when prompted<br>
+            3. View real-time gender detection results
+        </div>
+        
+        <div class="video-container">
+            <video id="videoElement" autoplay muted style="display: none;"></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <div id="loading">Click "Start Detection" to begin</div>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" onclick="startDetection()">Start Detection</button>
+            <button id="stopBtn" onclick="stopDetection()" disabled>Stop Detection</button>
+        </div>
+        
+        <div id="status" class="status stopped">
+            Status: Stopped
+        </div>
+        
+        <div class="results">
+            <h3>Detection Results:</h3>
+            <div id="results">No faces detected</div>
+        </div>
+    </div>
+
+    <script>
+        let isDetecting = false;
+        let video = document.getElementById('videoElement');
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let stream = null;
+        let processingInterval = null;
+        
+        async function startDetection() {
+            if (isDetecting) return;
+            
+            try {
+                // Request camera access
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: 640, 
+                        height: 480 
+                    } 
+                });
+                
+                // Set video source
+                video.srcObject = stream;
+                video.style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+                
+                // Update UI
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('status').className = 'status running';
+                document.getElementById('status').textContent = 'Status: Running - Camera active';
+                
+                isDetecting = true;
+                
+                // Start processing frames
+                processingInterval = setInterval(processFrame, 100); // Process every 100ms
+                
+                console.log('Camera access granted and detection started');
+                
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                alert('Error accessing camera: ' + error.message);
+                resetUI();
+            }
+        }
+        
+        function stopDetection() {
+            if (!isDetecting) return;
+            
+            // Stop processing
+            if (processingInterval) {
+                clearInterval(processingInterval);
+                processingInterval = null;
+            }
+            
+            // Stop camera
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            // Update UI
+            resetUI();
+            
+            console.log('Detection stopped');
+        }
+        
+        function resetUI() {
+            isDetecting = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            video.style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('status').className = 'status stopped';
+            document.getElementById('status').textContent = 'Status: Stopped';
+            document.getElementById('results').textContent = 'No faces detected';
+        }
+        
+        function processFrame() {
+            if (!isDetecting || video.videoWidth === 0) return;
+            
+            // Draw current frame to canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to base64
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Send to server for processing
+            fetch('/process_frame', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image: imageData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    displayResults(data.results);
+                }
+            })
+            .catch(error => {
+                console.error('Error processing frame:', error);
+            });
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            
+            if (results.length === 0) {
+                resultsDiv.textContent = 'No faces detected';
+                return;
+            }
+            
+            let html = '';
+            results.forEach((result, index) => {
+                html += `
+                    <div class="face-result">
+                        <strong>Face ${index + 1}:</strong> ${result.gender} 
+                        (Confidence: ${(result.confidence * 100).toFixed(1)}%)
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Gender Detection Web App loaded');
+        });
+    </script>
+</body>
+</html>
+
