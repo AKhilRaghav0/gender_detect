@@ -432,7 +432,7 @@ class LiveSCRFDetection:
         y_offset = 40
         for feature, value in features.items():
             if feature in ['jaw_strength', 'cheekbone_position', 'forehead_ratio']:
-                feature_text = ".2f"
+                feature_text = f"{feature}: {value:.2f}"
                 cv2.putText(frame, feature_text, (panel_x+5, panel_y+y_offset),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                 y_offset += 15
