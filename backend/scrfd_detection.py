@@ -452,7 +452,7 @@ if __name__ == "__main__":
             # Draw faces
             for x, y, w, h, conf in faces:
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                cv2.putText(frame, ".2f", (x, y-10),
+                cv2.putText(frame, f"{conf:.2f}", (x, y-10),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             cv2.imshow("SCRFD Test", frame)
