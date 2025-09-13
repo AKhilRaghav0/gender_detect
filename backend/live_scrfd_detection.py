@@ -457,7 +457,7 @@ class LiveSCRFDetection:
             self.fps_counter = 0
             self.fps_start_time = time.time()
 
-        fps_text = ".1f"
+        fps_text = f"{self.fps:.1f} FPS"
         faces_text = f"Faces: {face_count}"
 
         cv2.putText(frame, fps_text, (500, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
