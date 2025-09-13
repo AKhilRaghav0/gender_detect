@@ -1,44 +1,10 @@
-# GPU-optimized TensorFlow (automatically detects CUDA)
-tensorflow>=2.15.0
-tensorflow-hub>=0.16.0
-
-# NVIDIA GPU acceleration (optional - install if you have NVIDIA GPU)
-# tensorflow-gpu>=2.15.0  # Deprecated - now included in tensorflow
-# cupy-cuda11x>=12.0.0    # For CUDA 11.x (RTX 30xx series)
-# cupy-cuda12x>=12.0.0    # For CUDA 12.x (latest)
-
-# Computer Vision
-opencv-python>=4.8.0
-opencv-contrib-python>=4.8.0
-
-# Core ML libraries
-numpy>=1.24.0
-scikit-learn>=1.3.0
-
-# Image processing and augmentation
-Pillow>=10.0.0
-albumentations>=1.3.0
-
-# Visualization
-matplotlib>=3.7.0
-seaborn>=0.12.0
-
-# Utilities
-tqdm>=4.65.0
-pandas>=2.0.0
-psutil>=5.9.0
-
-# Memory optimization
-memory-profiler>=0.60.0
-
-# GPU monitoring (optional)
-pynvml>=11.4.0
-gpustat>=1.0.0
-
-# SCRFD Face Detection (ONNX-based)
+# InsightFace Gender Detection Requirements
+insightface>=0.7.3
 onnxruntime>=1.15.0
-
-# Advanced Gender Classification (PyTorch-based)
-torch>=2.0.0
-torchvision>=0.15.0
+opencv-python>=4.8.0
+numpy>=1.24.0
 Pillow>=10.0.0
+flask>=2.3.0
+
+# Optional: For better performance
+# onnxruntime-gpu  # If you have CUDA GPU
